@@ -44,6 +44,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -146,7 +147,9 @@ fun HomeScreen(
                             ) {
                                 Button(
                                     onClick = onNavigateToCreateCulture,
-                                    modifier = Modifier.weight(1f)
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .testTag("new_culture_button")
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Add,
@@ -158,7 +161,9 @@ fun HomeScreen(
 
                                 OutlinedButton(
                                     onClick = onNavigateToCultureList,
-                                    modifier = Modifier.weight(1f)
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .testTag("all_cultures_button")
                                 ) {
                                     Icon(
                                         imageVector = Icons.AutoMirrored.Filled.List,
@@ -323,6 +328,7 @@ fun CultureQuickCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .testTag("culture_card_${culture.name}")
             .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface

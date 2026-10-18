@@ -50,9 +50,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kubaice.celltrackai.domain.model.CellCulture
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     onNavigateToCultureList: () -> Unit,
@@ -61,12 +61,33 @@ fun HomeScreen(
 ) {
     val viewModel: HomeViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    HomeScreenContent(
+        state = uiState,
+        clearMessage = viewModel::clearMessage,
+        populateDemoData = viewModel::populateDemoData,
+        onNavigateToCultureList = onNavigateToCultureList,
+        onNavigateToCultureDetail = onNavigateToCultureDetail,
+        onNavigateToCreateCulture = onNavigateToCreateCulture,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun HomeScreenContent(
+    state: HomeUiState,
+    clearMessage: () -> Unit,
+    populateDemoData: () -> Unit,
+    onNavigateToCultureList: () -> Unit,
+    onNavigateToCultureDetail: (String) -> Unit,
+    onNavigateToCreateCulture: () -> Unit
+) {
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(uiState.message) {
-        uiState.message?.let {
+    LaunchedEffect(state.message) {
+        state.message?.let {
             snackbarHostState.showSnackbar(it)
-            viewModel.clearMessage()
+            clearMessage()
         }
     }
 
@@ -100,7 +121,7 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            if (uiState.isLoading) {
+            if (state.isLoading) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             } else {
                 LazyColumn(
@@ -119,7 +140,7 @@ fun HomeScreen(
                             SummaryCard(
                                 modifier = Modifier.weight(1f),
                                 title = "Active Cultures",
-                                value = uiState.totalActiveCultures.toString(),
+                                value = state.totalActiveCultures.toString(),
                                 icon = Icons.Default.Science,
                                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                                 contentColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -127,7 +148,7 @@ fun HomeScreen(
                             SummaryCard(
                                 modifier = Modifier.weight(1f),
                                 title = "Recent Updates (7d)",
-                                value = uiState.recentUpdatesCount.toString(),
+                                value = state.recentUpdatesCount.toString(),
                                 icon = Icons.Default.Update,
                                 containerColor = MaterialTheme.colorScheme.secondaryContainer,
                                 contentColor = MaterialTheme.colorScheme.onSecondaryContainer
@@ -175,11 +196,11 @@ fun HomeScreen(
                             }
 
                             OutlinedButton(
-                                onClick = { viewModel.populateDemoData() },
+                                onClick = { populateDemoData() },
                                 modifier = Modifier.fillMaxWidth(),
-                                enabled = !uiState.isPopulatingDemo
+                                enabled = !state.isPopulatingDemo
                             ) {
-                                if (uiState.isPopulatingDemo) {
+                                if (state.isPopulatingDemo) {
                                     CircularProgressIndicator(
                                         modifier = Modifier
                                             .height(18.dp)
@@ -210,7 +231,7 @@ fun HomeScreen(
                         )
                     }
 
-                    if (uiState.isEmpty || uiState.recentActiveCultures.isEmpty()) {
+                    if (state.isEmpty || state.recentActiveCultures.isEmpty()) {
                         item {
                             Card(
                                 modifier = Modifier
@@ -251,7 +272,7 @@ fun HomeScreen(
                             }
                         }
                     } else {
-                        items(uiState.recentActiveCultures, key = { it.id }) { culture ->
+                        items(state.recentActiveCultures, key = { it.id }) { culture ->
                             CultureQuickCard(
                                 culture = culture,
                                 onClick = { onNavigateToCultureDetail(culture.id) }
@@ -389,7 +410,12 @@ fun CultureQuickCard(
 private fun HomeScreenPreview() {
     MaterialTheme {
         Surface {
-            HomeScreen(
+            HomeScreenContent(
+                state = HomeUiState(
+                    isLoading = false,
+                ),
+                populateDemoData = {},
+                clearMessage = {},
                 onNavigateToCultureList = {},
                 onNavigateToCultureDetail = {},
                 onNavigateToCreateCulture = {},

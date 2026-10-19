@@ -45,6 +45,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -130,7 +131,9 @@ fun CreateEditCultureScreen(
                                 )
                             }
                         },
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("culture_name_input"),
                         singleLine = true
                     )
 
@@ -140,7 +143,9 @@ fun CreateEditCultureScreen(
                         onValueChange = { viewModel.onCellTypeChanged(it) },
                         label = { Text("Cell Type / Line") },
                         placeholder = { Text("e.g. Human iPSC WTC11") },
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("cell_type_input"),
                         singleLine = true
                     )
 
@@ -191,7 +196,8 @@ fun CreateEditCultureScreen(
                         placeholder = { Text("Enter media formulation, passaging conditions, or background info...") },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(140.dp),
+                            .height(140.dp)
+                            .testTag("culture_notes_input"),
                         maxLines = 6
                     )
 
@@ -203,6 +209,7 @@ fun CreateEditCultureScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp)
+                            .testTag("save_culture_button")
                     ) {
                         Icon(
                             imageVector = Icons.Default.Save,

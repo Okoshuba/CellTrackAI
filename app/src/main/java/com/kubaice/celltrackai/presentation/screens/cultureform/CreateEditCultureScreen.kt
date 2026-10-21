@@ -1,6 +1,5 @@
-package com.kubaice.celltrackai.presentation.cultureform
+package com.kubaice.celltrackai.presentation.screens.cultureform
 
-import android.R.attr.fontWeight
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -16,11 +15,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,8 +32,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,13 +39,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -132,7 +124,7 @@ private fun CreateEditCultureScreenContent(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(dimensionResource(R.dimen.padding_large))
+                        .padding(dimensionResource(R.dimen.padding_16))
                         .verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_large))
                 ) {
@@ -234,7 +226,7 @@ private fun CreateEditCultureScreenContent(
                         Icon(
                             imageVector = Icons.Default.Save,
                             contentDescription = null,
-                            modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_small))
+                            modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_8))
                         )
                         Text(
                             text = stringResource(if (state.isEditMode) R.string.btn_update_culture else R.string.btn_save_culture),

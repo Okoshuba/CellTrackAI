@@ -1,4 +1,4 @@
-package com.kubaice.celltrackai.presentation.literature
+package com.kubaice.celltrackai.presentation.screens.literature
 
 import android.content.Intent
 import android.net.Uri
@@ -137,13 +137,13 @@ private fun LiteratureSearchScreenContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(horizontal = dimensionResource(R.dimen.padding_large))
+                .padding(horizontal = dimensionResource(R.dimen.padding_16))
         ) {
             // Search Bar & Button Row
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = dimensionResource(R.dimen.padding_small)),
+                    .padding(vertical = dimensionResource(R.dimen.padding_8)),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small))
             ) {
@@ -193,17 +193,17 @@ private fun LiteratureSearchScreenContent(
                 shape = MaterialTheme.shapes.small,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = dimensionResource(R.dimen.padding_tiny))
+                    .padding(vertical = dimensionResource(R.dimen.padding_4))
             ) {
                 Row(
-                    modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium)),
+                    modifier = Modifier.padding(dimensionResource(R.dimen.padding_12)),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
                         imageVector = Icons.Default.Info,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                        modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_small))
+                        modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_8))
                     )
                     Text(
                         text = stringResource(R.string.header_mock_literature_notice),
@@ -220,7 +220,7 @@ private fun LiteratureSearchScreenContent(
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(dimensionResource(R.dimen.padding_huge)),
+                            .padding(dimensionResource(R.dimen.padding_32)),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
@@ -295,7 +295,7 @@ fun PublicationCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.padding_large)),
+                .padding(dimensionResource(R.dimen.padding_16)),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small))
         ) {
             Text(
@@ -343,7 +343,7 @@ fun PublicationCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = dimensionResource(R.dimen.padding_tiny)),
+                    .padding(top = dimensionResource(R.dimen.padding_4)),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {

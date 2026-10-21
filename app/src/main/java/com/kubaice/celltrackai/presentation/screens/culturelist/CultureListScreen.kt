@@ -1,10 +1,9 @@
-package com.kubaice.celltrackai.presentation.culturelist
+package com.kubaice.celltrackai.presentation.screens.culturelist
 
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,7 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.Clear
@@ -25,7 +23,6 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Unarchive
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
@@ -38,8 +35,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -127,7 +122,7 @@ private fun CultureListScreenContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(horizontal = dimensionResource(R.dimen.padding_large))
+                .padding(horizontal = dimensionResource(R.dimen.padding_16))
         ) {
             // Search Bar
             OutlinedTextField(
@@ -135,10 +130,13 @@ private fun CultureListScreenContent(
                 onValueChange = onSearchQueryChanged,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = dimensionResource(R.dimen.padding_small)),
+                    .padding(vertical = dimensionResource(R.dimen.padding_8)),
                 placeholder = { Text(stringResource(R.string.placeholder_search_cultures)) },
                 leadingIcon = {
-                    Icon(imageVector = Icons.Default.Search, contentDescription = null)
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = null,
+                    )
                 },
                 trailingIcon = {
                     if (state.searchQuery.isNotEmpty()) {
@@ -158,23 +156,45 @@ private fun CultureListScreenContent(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = dimensionResource(R.dimen.padding_small)),
+                    .padding(bottom = dimensionResource(R.dimen.padding_8)),
                 horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small))
             ) {
                 FilterChip(
                     selected = state.statusFilter == StatusFilter.ALL,
                     onClick = { onStatusFilterSelected(StatusFilter.ALL) },
-                    label = { Text(stringResource(R.string.label_all_count, state.cultures.size)) }
+                    label = {
+                        Text(
+                            text = stringResource(R.string.label_all_count, state.cultures.size)
+                        )
+                    }
                 )
                 FilterChip(
                     selected = state.statusFilter == StatusFilter.ACTIVE,
                     onClick = { onStatusFilterSelected(StatusFilter.ACTIVE) },
-                    label = { Text(stringResource(R.string.label_active_count, state.cultures.count { it.status == CultureStatus.ACTIVE })) }
+                    label = {
+                        Text(
+                            text = stringResource(
+                                R.string.label_active_count,
+                                state.cultures.count {
+                                    it.status == CultureStatus.ACTIVE
+                                }
+                            )
+                        )
+                    }
                 )
                 FilterChip(
                     selected = state.statusFilter == StatusFilter.ARCHIVED,
                     onClick = { onStatusFilterSelected(StatusFilter.ARCHIVED) },
-                    label = { Text(stringResource(R.string.label_archived_count, state.cultures.count { it.status == CultureStatus.ARCHIVED })) }
+                    label = {
+                        Text(
+                            text = stringResource(
+                                R.string.label_archived_count,
+                                state.cultures.count {
+                                    it.status == CultureStatus.ARCHIVED
+                                }
+                            )
+                        )
+                    }
                 )
             }
 
@@ -185,7 +205,7 @@ private fun CultureListScreenContent(
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(dimensionResource(R.dimen.padding_huge)),
+                            .padding(dimensionResource(R.dimen.padding_32)),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
@@ -238,7 +258,7 @@ fun CultureListItemCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.padding_large)),
+                .padding(dimensionResource(R.dimen.padding_16)),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {

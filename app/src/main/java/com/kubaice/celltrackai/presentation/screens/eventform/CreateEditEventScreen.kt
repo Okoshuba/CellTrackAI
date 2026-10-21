@@ -1,4 +1,4 @@
-package com.kubaice.celltrackai.presentation.eventform
+package com.kubaice.celltrackai.presentation.screens.eventform
 
 import android.net.Uri
 import java.text.SimpleDateFormat
@@ -27,7 +27,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.CalendarToday
@@ -58,8 +57,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -177,7 +174,7 @@ private fun CreateEditEventScreenContent(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(dimensionResource(R.dimen.padding_large))
+                        .padding(dimensionResource(R.dimen.padding_16))
                         .verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_large))
                 ) {
@@ -252,7 +249,7 @@ private fun CreateEditEventScreenContent(
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(dimensionResource(R.dimen.padding_large))
+                                .padding(dimensionResource(R.dimen.padding_16))
                         ) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -325,7 +322,7 @@ private fun CreateEditEventScreenContent(
                             Icon(
                                 imageVector = Icons.Default.AutoAwesome,
                                 contentDescription = null,
-                                modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_small))
+                                modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_8))
                             )
                             Text(stringResource(R.string.btn_ai_structuring_helper), fontWeight = FontWeight.Bold)
                         }
@@ -347,7 +344,7 @@ private fun CreateEditEventScreenContent(
                                 Icon(
                                     imageVector = Icons.Default.AddPhotoAlternate,
                                     contentDescription = null,
-                                    modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_tiny))
+                                    modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_4))
                                 )
                                 Text(stringResource(R.string.btn_add_image))
                             }
@@ -377,7 +374,7 @@ private fun CreateEditEventScreenContent(
                                             onClick = { onRemoveImageUri(uri) },
                                             modifier = Modifier
                                                 .align(Alignment.TopEnd)
-                                                .padding(dimensionResource(R.dimen.padding_extra_small))
+                                                .padding(dimensionResource(R.dimen.padding_2))
                                                 .size(dimensionResource(R.dimen.icon_size_large))
                                                 .background(
                                                     MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
@@ -409,7 +406,7 @@ private fun CreateEditEventScreenContent(
                         Icon(
                             imageVector = Icons.Default.Save,
                             contentDescription = null,
-                            modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_small))
+                            modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_8))
                         )
                         Text(
                             text = stringResource(if (state.isEditMode) R.string.btn_update_event else R.string.btn_save_event),
@@ -499,7 +496,7 @@ fun StructuringResultDialog(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(dimensionResource(R.dimen.padding_medium)),
+                            .padding(dimensionResource(R.dimen.padding_12)),
                         verticalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         result.parsedCellType?.let {

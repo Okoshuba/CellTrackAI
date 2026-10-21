@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import com.kubaice.celltrackai.domain.model.CellCulture
 import com.kubaice.celltrackai.domain.model.CultureStatus
 import com.kubaice.celltrackai.domain.repository.CellCultureRepository
-import com.kubaice.celltrackai.presentation.cultureform.CreateEditCultureViewModel
+import com.kubaice.celltrackai.presentation.screens.cultureform.CreateEditCultureViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow

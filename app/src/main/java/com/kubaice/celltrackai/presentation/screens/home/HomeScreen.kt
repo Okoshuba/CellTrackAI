@@ -1,4 +1,4 @@
-package com.kubaice.celltrackai.presentation.home
+package com.kubaice.celltrackai.presentation.screens.home
 
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -21,7 +21,6 @@ import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Dataset
 import androidx.compose.material.icons.filled.Science
-import androidx.compose.material.icons.filled.Update
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -43,7 +42,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -105,7 +105,7 @@ private fun HomeScreenContent(
                             imageVector = Icons.Default.Science,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_small))
+                            modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_8))
                         )
                         Text(
                             text = stringResource(R.string.app_name),
@@ -132,7 +132,7 @@ private fun HomeScreenContent(
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = dimensionResource(R.dimen.padding_large)),
+                        .padding(horizontal = dimensionResource(R.dimen.padding_16)),
                     verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_large))
                 ) {
                     item {
@@ -172,7 +172,7 @@ private fun HomeScreenContent(
                                     Icon(
                                         imageVector = Icons.Default.Add,
                                         contentDescription = null,
-                                        modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_tiny))
+                                        modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_4))
                                     )
                                     Text(stringResource(R.string.btn_new_culture))
                                 }
@@ -186,7 +186,7 @@ private fun HomeScreenContent(
                                     Icon(
                                         imageVector = Icons.AutoMirrored.Filled.List,
                                         contentDescription = null,
-                                        modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_tiny))
+                                        modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_4))
                                     )
                                     Text(stringResource(R.string.btn_all_cultures))
                                 }
@@ -210,7 +210,7 @@ private fun HomeScreenContent(
                                     Icon(
                                         imageVector = Icons.Default.Dataset,
                                         contentDescription = null,
-                                        modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_small))
+                                        modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_8))
                                     )
                                     Text(stringResource(R.string.btn_populate_demo))
                                 }
@@ -224,7 +224,7 @@ private fun HomeScreenContent(
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_small))
+                            modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_8))
                         )
                     }
 
@@ -233,7 +233,7 @@ private fun HomeScreenContent(
                             Card(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(vertical = dimensionResource(R.dimen.padding_medium)),
+                                    .padding(vertical = dimensionResource(R.dimen.padding_12)),
                                 colors = CardDefaults.cardColors(
                                     containerColor = MaterialTheme.colorScheme.surfaceVariant
                                 )
@@ -241,7 +241,7 @@ private fun HomeScreenContent(
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(dimensionResource(R.dimen.padding_extra_large)),
+                                        .padding(dimensionResource(R.dimen.padding_24)),
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                     verticalArrangement = Arrangement.Center
                                 ) {
@@ -291,9 +291,9 @@ fun SummaryCard(
     modifier: Modifier = Modifier,
     title: String,
     value: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    containerColor: androidx.compose.ui.graphics.Color,
-    contentColor: androidx.compose.ui.graphics.Color
+    icon: ImageVector,
+    containerColor: Color,
+    contentColor: Color
 ) {
     Card(
         modifier = modifier,
@@ -305,7 +305,7 @@ fun SummaryCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.padding_large))
+                .padding(dimensionResource(R.dimen.padding_16))
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -358,7 +358,7 @@ fun CultureQuickCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.padding_large))
+                .padding(dimensionResource(R.dimen.padding_16))
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -384,8 +384,8 @@ fun CultureQuickCard(
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier.padding(
-                            horizontal = dimensionResource(R.dimen.padding_small),
-                            vertical = dimensionResource(R.dimen.padding_tiny)
+                            horizontal = dimensionResource(R.dimen.padding_8),
+                            vertical = dimensionResource(R.dimen.padding_4)
                         ),
                         fontWeight = FontWeight.Bold
                     )

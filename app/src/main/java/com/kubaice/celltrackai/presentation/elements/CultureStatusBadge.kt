@@ -4,16 +4,12 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.kubaice.celltrackai.R
 import com.kubaice.celltrackai.domain.model.CultureStatus
 import com.kubaice.celltrackai.presentation.theme.StatusActiveContainerDark
@@ -27,7 +23,7 @@ fun CultureStatusBadge(
     modifier: Modifier = Modifier,
     shape: Shape = MaterialTheme.shapes.extraSmall,
     horizontalPadding: Dp = dimensionResource(R.dimen.padding_6),
-    verticalPadding: Dp = dimensionResource(R.dimen.padding_extra_small),
+    verticalPadding: Dp = dimensionResource(R.dimen.padding_2),
 ) {
     val isDark = isSystemInDarkTheme()
     val isActive = status == CultureStatus.ACTIVE
@@ -63,7 +59,7 @@ fun CultureStatusBadge(
     modifier: Modifier = Modifier,
     shape: Shape = MaterialTheme.shapes.extraSmall,
     horizontalPadding: Dp = dimensionResource(R.dimen.padding_6),
-    verticalPadding: Dp = dimensionResource(R.dimen.padding_extra_small),
+    verticalPadding: Dp = dimensionResource(R.dimen.padding_2),
 ) {
     Surface(
         color = containerColor,

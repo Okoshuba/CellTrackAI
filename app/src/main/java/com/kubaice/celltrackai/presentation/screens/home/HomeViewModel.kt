@@ -1,4 +1,4 @@
-package com.kubaice.celltrackai.presentation.home
+package com.kubaice.celltrackai.presentation.screens.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

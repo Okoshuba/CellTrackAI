@@ -9,18 +9,18 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.kubaice.celltrackai.presentation.culturedetail.CultureDetailScreen
-import com.kubaice.celltrackai.presentation.culturedetail.CultureDetailViewModel
-import com.kubaice.celltrackai.presentation.cultureform.CreateEditCultureScreen
-import com.kubaice.celltrackai.presentation.cultureform.CreateEditCultureViewModel
-import com.kubaice.celltrackai.presentation.culturelist.CultureListScreen
-import com.kubaice.celltrackai.presentation.culturelist.CultureListViewModel
-import com.kubaice.celltrackai.presentation.eventform.CreateEditEventScreen
-import com.kubaice.celltrackai.presentation.eventform.CreateEditEventViewModel
-import com.kubaice.celltrackai.presentation.home.HomeScreen
-import com.kubaice.celltrackai.presentation.imagepreview.ImagePreviewScreen
-import com.kubaice.celltrackai.presentation.literature.LiteratureSearchScreen
-import com.kubaice.celltrackai.presentation.literature.LiteratureSearchViewModel
+import com.kubaice.celltrackai.presentation.screens.culturedetail.CultureDetailScreen
+import com.kubaice.celltrackai.presentation.screens.culturedetail.CultureDetailViewModel
+import com.kubaice.celltrackai.presentation.screens.cultureform.CreateEditCultureScreen
+import com.kubaice.celltrackai.presentation.screens.cultureform.CreateEditCultureViewModel
+import com.kubaice.celltrackai.presentation.screens.culturelist.CultureListScreen
+import com.kubaice.celltrackai.presentation.screens.culturelist.CultureListViewModel
+import com.kubaice.celltrackai.presentation.screens.eventform.CreateEditEventScreen
+import com.kubaice.celltrackai.presentation.screens.eventform.CreateEditEventViewModel
+import com.kubaice.celltrackai.presentation.screens.home.HomeScreen
+import com.kubaice.celltrackai.presentation.screens.imagepreview.ImagePreviewScreen
+import com.kubaice.celltrackai.presentation.screens.literature.LiteratureSearchScreen
+import com.kubaice.celltrackai.presentation.screens.literature.LiteratureSearchViewModel
 
 @Composable
 fun CellTrackNavHost(

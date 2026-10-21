@@ -59,7 +59,7 @@ fun PublicationCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.padding_large)),
+                .padding(dimensionResource(R.dimen.padding_16)),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small))
         ) {
             Text(
@@ -107,7 +107,7 @@ fun PublicationCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = dimensionResource(R.dimen.padding_tiny)),
+                    .padding(top = dimensionResource(R.dimen.padding_4)),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -175,7 +175,7 @@ fun PublicationItemCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.padding_medium))
+                .padding(dimensionResource(R.dimen.padding_12))
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -213,7 +213,7 @@ fun PublicationItemCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = dimensionResource(R.dimen.padding_tiny)),
+                    .padding(top = dimensionResource(R.dimen.padding_4)),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {

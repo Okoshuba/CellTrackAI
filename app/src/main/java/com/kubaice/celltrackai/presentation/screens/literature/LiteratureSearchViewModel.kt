@@ -1,4 +1,4 @@
-package com.kubaice.celltrackai.presentation.literature
+package com.kubaice.celltrackai.presentation.screens.literature
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel

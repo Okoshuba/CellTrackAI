@@ -1,4 +1,4 @@
-package com.kubaice.celltrackai.presentation.culturelist
+package com.kubaice.celltrackai.presentation.screens.culturelist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

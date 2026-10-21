@@ -1,4 +1,4 @@
-package com.kubaice.celltrackai.presentation.culturedetail
+package com.kubaice.celltrackai.presentation.screens.culturedetail
 
 import android.content.Intent
 import android.net.Uri
@@ -7,11 +7,9 @@ import java.util.Date
 import java.util.Locale
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,10 +24,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Add
@@ -42,7 +38,6 @@ import androidx.compose.material.icons.filled.Unarchive
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -55,8 +50,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -81,13 +74,14 @@ import com.kubaice.celltrackai.R
 import com.kubaice.celltrackai.domain.model.CellCulture
 import com.kubaice.celltrackai.domain.model.CultureEvent
 import com.kubaice.celltrackai.domain.model.CultureStatus
-import com.kubaice.celltrackai.domain.model.EventType
 import com.kubaice.celltrackai.domain.model.ScientificPublication
 import com.kubaice.celltrackai.presentation.elements.CellTrackTopAppBar
 import com.kubaice.celltrackai.presentation.elements.CultureStatusBadge
 import com.kubaice.celltrackai.presentation.elements.EventTypeIcon
 import com.kubaice.celltrackai.presentation.elements.LoadingIndicator
 import com.kubaice.celltrackai.presentation.elements.PublicationItemCard
+
+private const val CULTURE_TITLE_MAX_LINES = 2
 
 @Composable
 fun CultureDetailScreen(
@@ -197,7 +191,7 @@ private fun CultureDetailScreenContent(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(dimensionResource(R.dimen.padding_extra_large)),
+                        .padding(dimensionResource(R.dimen.padding_24)),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
@@ -213,7 +207,7 @@ private fun CultureDetailScreenContent(
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = dimensionResource(R.dimen.padding_large)),
+                        .padding(horizontal = dimensionResource(R.dimen.padding_16)),
                     verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_large))
                 ) {
                     item {
@@ -289,7 +283,7 @@ private fun CultureDetailScreenContent(
                                 text = stringResource(R.string.header_associated_publications, state.publications.size),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_small))
+                                modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_8))
                             )
                         }
 
@@ -312,7 +306,7 @@ private fun CultureDetailScreenContent(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = dimensionResource(R.dimen.padding_small)),
+                                .padding(top = dimensionResource(R.dimen.padding_8)),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -335,7 +329,7 @@ private fun CultureDetailScreenContent(
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(dimensionResource(R.dimen.padding_extra_large)),
+                                        .padding(dimensionResource(R.dimen.padding_24)),
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     Text(
@@ -387,7 +381,7 @@ fun CultureMetadataSection(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.padding_large))
+                .padding(dimensionResource(R.dimen.padding_16))
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -398,14 +392,16 @@ fun CultureMetadataSection(
                     text = culture.name,
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
+                    maxLines = CULTURE_TITLE_MAX_LINES,
+                    overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colorScheme.onSurface
                 )
 
                 CultureStatusBadge(
                     status = culture.status,
                     shape = MaterialTheme.shapes.small,
-                    horizontalPadding = dimensionResource(R.dimen.padding_small),
-                    verticalPadding = dimensionResource(R.dimen.padding_tiny),
+                    horizontalPadding = dimensionResource(R.dimen.padding_8),
+                    verticalPadding = dimensionResource(R.dimen.padding_4),
                     modifier = Modifier.clickable(onClick = onToggleArchive)
                 )
             }
@@ -443,7 +439,7 @@ fun CultureMetadataSection(
                 Text(
                     text = culture.notes,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
             }
         }
@@ -465,7 +461,7 @@ fun PublicationItemCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.padding_medium))
+                .padding(dimensionResource(R.dimen.padding_12))
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -553,7 +549,7 @@ fun TimelineEventCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.padding_large)),
+                .padding(dimensionResource(R.dimen.padding_16)),
             verticalAlignment = Alignment.Top
         ) {
             // Event Type Icon Container
@@ -608,7 +604,10 @@ fun TimelineEventCard(
                                 text = stringResource(R.string.label_passage_badge, passage),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSecondaryContainer,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                modifier = Modifier.padding(
+                                    horizontal = dimensionResource(R.dimen.padding_6),
+                                    vertical = dimensionResource(R.dimen.padding_2),
+                                ),
                                 fontWeight = FontWeight.SemiBold
                             )
                         }
@@ -623,7 +622,10 @@ fun TimelineEventCard(
                                 text = stringResource(R.string.label_confluency_badge, confluency.toInt()),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onTertiaryContainer,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                modifier = Modifier.padding(
+                                    horizontal = dimensionResource(R.dimen.padding_6),
+                                    vertical = dimensionResource(R.dimen.padding_2),
+                                ),
                                 fontWeight = FontWeight.SemiBold
                             )
                         }

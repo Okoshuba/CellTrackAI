@@ -1,4 +1,4 @@
-package com.kubaice.celltrackai.presentation.imagepreview
+package com.kubaice.celltrackai.presentation.screens.imagepreview
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTransformGestures
@@ -59,7 +59,12 @@ private fun ImagePreviewScreenContent(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.title_image_preview), fontWeight = FontWeight.Bold) },
+                title = {
+                    Text(
+                        text = stringResource(R.string.title_image_preview),
+                        fontWeight = FontWeight.Bold,
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(

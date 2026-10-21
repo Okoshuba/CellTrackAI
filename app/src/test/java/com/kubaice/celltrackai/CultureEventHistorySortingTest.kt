@@ -8,7 +8,7 @@ import com.kubaice.celltrackai.domain.model.EventType
 import com.kubaice.celltrackai.domain.model.ScientificPublication
 import com.kubaice.celltrackai.domain.repository.CultureEventRepository
 import com.kubaice.celltrackai.domain.repository.PublicationRepository
-import com.kubaice.celltrackai.presentation.culturedetail.CultureDetailViewModel
+import com.kubaice.celltrackai.presentation.screens.culturedetail.CultureDetailViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow

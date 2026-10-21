@@ -33,7 +33,7 @@ fun EmptyStateCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = dimensionResource(R.dimen.padding_medium)),
+            .padding(vertical = dimensionResource(R.dimen.padding_12)),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
@@ -41,7 +41,7 @@ fun EmptyStateCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.padding_extra_large)),
+                .padding(dimensionResource(R.dimen.padding_24)),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {

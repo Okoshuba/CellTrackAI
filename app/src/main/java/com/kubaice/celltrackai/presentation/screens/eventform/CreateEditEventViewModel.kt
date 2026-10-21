@@ -1,4 +1,4 @@
-package com.kubaice.celltrackai.presentation.eventform
+package com.kubaice.celltrackai.presentation.screens.eventform
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel

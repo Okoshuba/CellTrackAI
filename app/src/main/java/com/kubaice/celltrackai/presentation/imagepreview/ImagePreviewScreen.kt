@@ -11,7 +11,9 @@ import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -28,12 +30,26 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.AsyncImage
+import com.kubaice.celltrackai.R
+
+@Composable
+fun ImagePreviewScreen(
+    imageUri: String,
+    onNavigateBack: () -> Unit
+) {
+    ImagePreviewScreenContent(
+        imageUri = imageUri,
+        onNavigateBack = onNavigateBack
+    )
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ImagePreviewScreen(
+private fun ImagePreviewScreenContent(
     imageUri: String,
     onNavigateBack: () -> Unit
 ) {
@@ -43,12 +59,12 @@ fun ImagePreviewScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Microscopy Image Preview", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.title_image_preview), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.cd_back),
                             tint = Color.White
                         )
                     }
@@ -61,7 +77,7 @@ fun ImagePreviewScreen(
                         }) {
                             Icon(
                                 imageVector = Icons.Default.RestartAlt,
-                                contentDescription = "Reset Zoom",
+                                contentDescription = stringResource(R.string.cd_reset_zoom),
                                 tint = Color.White
                             )
                         }
@@ -94,7 +110,7 @@ fun ImagePreviewScreen(
         ) {
             AsyncImage(
                 model = imageUri,
-                contentDescription = "Microscopy Image Fullscreen",
+                contentDescription = stringResource(R.string.cd_fullscreen_image),
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .fillMaxSize()
@@ -104,6 +120,19 @@ fun ImagePreviewScreen(
                         translationX = offset.x,
                         translationY = offset.y
                     )
+            )
+        }
+    }
+}
+
+@Composable
+@Preview
+private fun ImagePreviewScreenPreview() {
+    MaterialTheme {
+        Surface {
+            ImagePreviewScreenContent(
+                imageUri = "",
+                onNavigateBack = {}
             )
         }
     }

@@ -1,3 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">CellTrack AI</string>
+
+    <!-- Navigation & Titles -->
+    <string name="title_cell_cultures">Cell Cultures</string>
+    <string name="title_literature_search">Literature Search</string>
+    <string name="title_image_preview">Microscopy Image Preview</string>
+    <string name="title_culture_details">Culture Details</string>
+    <string name="title_edit_event">Edit Event</string>
+    <string name="title_log_event">Log Culture Event</string>
+    <string name="title_edit_culture">Edit Culture</string>
+    <string name="title_new_culture">New Cell Culture</string>
+
+    <!-- Buttons & Actions -->
+    <string name="btn_new_culture">New Culture</string>
+    <string name="btn_all_cultures">All Cultures</string>
+    <string name="btn_populate_demo">Populate Demo Data</string>
+    <string name="btn_loading_demo">Loading Demo Data...</string>
+    <string name="btn_search">Search</string>
+    <string name="btn_add_event">Add Event</string>
+    <string name="btn_literature">Literature</string>
+    <string name="btn_export_csv">Export CSV</string>
+    <string name="btn_archive">Archive</string>
+    <string name="btn_unarchive">Unarchive</string>
+    <string name="btn_view_paper">View Paper</string>
+    <string name="btn_associated">Associated</string>
+    <string name="btn_associate">Associate</string>
+    <string name="btn_add_image">Add Image</string>
+    <string name="btn_save_event">Save Event</string>
+    <string name="btn_update_event">Update Event</string>
+    <string name="btn_save_culture">Save Culture</string>
+    <string name="btn_update_culture">Update Culture</string>
+    <string name="btn_ai_structuring_helper">AI Structuring Helper</string>
+    <string name="btn_structuring_ai">Structuring with AI...</string>
+    <string name="btn_apply_to_form">Apply to Form</string>
+    <string name="btn_discard">Discard</string>
+    <string name="btn_clear_confluency">Clear Confluency</string>
+    <string name="btn_ok">OK</string>
+    <string name="btn_cancel">Cancel</string>
+
+    <!-- Headers & Sections -->
+    <string name="header_active_cultures">Active Cultures</string>
+    <string name="header_recent_updates">Recent Updates (7d)</string>
+    <string name="header_recently_updated_active">Recently Updated Active Cultures</string>
+    <string name="header_no_active_cultures">No Active Cultures Found</string>
+    <string name="header_no_active_cultures_desc">Click \'Populate Demo Data\' above or \'New Culture\' to create your first culture tracking entry.</string>
+    <string name="header_no_cultures_filter">No cultures match your search/filter.</string>
+    <string name="header_mock_literature_notice">Mock Literature Service: Search results simulate PubMed integration.</string>
+    <string name="header_no_publications_found">No publication results found.</string>
+    <string name="header_no_publications_hint">Try searching for terms like \'iPSC\', \'HeLa\', \'Vero\', or \'confluency\'.</string>
+    <string name="header_associated_publications">Associated Publications (%1$d)</string>
+    <string name="header_event_timeline">Event Timeline (%1$d)</string>
+    <string name="header_no_events_logged">No events logged yet.</string>
+    <string name="btn_log_first_event">Log First Observation / Event</string>
+    <string name="header_confluency_percentage">Confluency Percentage</string>
+    <string name="header_observation_notes">Observation Notes &amp; Technical Details</string>
+    <string name="header_attached_images">Attached Microscopy Images (%1$d)</string>
+    <string name="header_culture_status">Culture Status</string>
+    <string name="header_ai_review_title">AI Structured Observation Review</string>
+
+    <!-- AI Structuring Dialog Labels -->
+    <string name="ai_label_cell_type">Cell Type: %1$s</string>
+    <string name="ai_label_passage_number">Passage Number: %1$d</string>
+    <string name="ai_label_confluency">Confluency: %1$.0f%%</string>
+    <string name="ai_label_phenotypes">Phenotypes: %1$s</string>
+    <string name="ai_label_contamination_risk">Contamination Risk: %1$s</string>
+    <string name="ai_label_recommendations">Recommendations: %1$s</string>
+
+    <!-- Labels & Placeholders -->
+    <string name="placeholder_search_cultures">Search by name or cell type...</string>
+    <string name="placeholder_search_pubmed">Search PubMed papers...</string>
+    <string name="label_all_count">All (%1$d)</string>
+    <string name="label_active_count">Active (%1$d)</string>
+    <string name="label_archived_count">Archived (%1$d)</string>
+    <string name="label_associating_with">Associating with: %1$s</string>
+    <string name="label_culture_name">Culture Name / Identifier *</string>
+    <string name="placeholder_culture_name">e.g. HeLa Line Passage #12</string>
+    <string name="label_cell_type">Cell Type / Line</string>
+    <string name="placeholder_cell_type">e.g. Human iPSC WTC11</string>
+    <string name="label_start_date">Culture Start Date</string>
+    <string name="label_notes_protocol">Culture Notes &amp; Protocol Info</string>
+    <string name="placeholder_culture_notes">Enter media formulation, passaging conditions, or background info...</string>
+    <string name="label_event_type">Event Type *</string>
+    <string name="label_date_time">Date &amp; Time</string>
+    <string name="label_passage_number_optional">Passage Number (Optional)</string>
+    <string name="placeholder_passage_number">e.g. 14</string>
+    <string name="label_not_set">Not Set</string>
+    <string name="placeholder_event_notes">Describe cell morphology, media color, growth status, or passaging ratio...</string>
+    <string name="label_started">Started: %1$s</string>
+    <string name="label_updated">Updated: %1$s</string>
+    <string name="label_last_updated">Last updated: %1$s</string>
+    <string name="label_passage_badge">Passage #%1$d</string>
+    <string name="label_confluency_badge">Confluency: %1$d%%</string>
+    <string name="label_status_active">Active</string>
+    <string name="label_status_archived">Archived</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_back">Back</string>
+    <string name="cd_add_culture">Add Culture</string>
+    <string name="cd_clear_search">Clear search</string>
+    <string name="cd_clear">Clear</string>
+    <string name="cd_archive">Archive</string>
+    <string name="cd_unarchive">Unarchive</string>
+    <string name="cd_edit_culture">Edit Culture</string>
+    <string name="cd_remove_association">Remove Association</string>
+    <string name="cd_delete_event">Delete event</string>
+    <string name="cd_reset_zoom">Reset Zoom</string>
+    <string name="cd_select_date">Select Date</string>
+    <string name="cd_remove_image">Remove Image</string>
+    <string name="cd_attached_image">Attached Image</string>
+    <string name="cd_event_attachment">Event attachment</string>
+    <string name="cd_fullscreen_image">Microscopy Image Fullscreen</string>
+
+    <!-- Messages -->
+    <string name="msg_culture_not_found">Culture not found.</string>
+    <string name="msg_csv_exported">CSV exported successfully</string>
+    <string name="msg_csv_export_failed">Failed to export CSV: %1$s</string>
 </resources>

@@ -39,6 +39,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -52,28 +53,53 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kubaice.celltrackai.R
 import com.kubaice.celltrackai.domain.model.ScientificPublication
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LiteratureSearchScreen(
-    viewModel: LiteratureSearchViewModel,
+    viewModel: LiteratureSearchViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LiteratureSearchScreenContent(
+        state = uiState,
+        onSearchQueryChanged = viewModel::onSearchQueryChanged,
+        onPerformSearch = viewModel::performSearch,
+        onToggleAssociation = viewModel::toggleAssociation,
+        clearMessage = viewModel::clearMessage,
+        onNavigateBack = onNavigateBack
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun LiteratureSearchScreenContent(
+    state: LiteratureSearchUiState,
+    onSearchQueryChanged: (String) -> Unit,
+    onPerformSearch: () -> Unit,
+    onToggleAssociation: (ScientificPublication) -> Unit,
+    clearMessage: () -> Unit,
+    onNavigateBack: () -> Unit
+) {
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    LaunchedEffect(uiState.message) {
-        uiState.message?.let {
+    LaunchedEffect(state.message) {
+        state.message?.let {
             snackbarHostState.showSnackbar(it)
-            viewModel.clearMessage()
+            clearMessage()
         }
     }
 
@@ -82,10 +108,10 @@ fun LiteratureSearchScreen(
             TopAppBar(
                 title = {
                     Column {
-                        Text("Literature Search", fontWeight = FontWeight.Bold)
-                        if (!uiState.cultureName.isNullOrBlank()) {
+                        Text(stringResource(R.string.title_literature_search), fontWeight = FontWeight.Bold)
+                        if (!state.cultureName.isNullOrBlank()) {
                             Text(
-                                text = "Associating with: ${uiState.cultureName}",
+                                text = stringResource(R.string.label_associating_with, state.cultureName),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -96,7 +122,7 @@ fun LiteratureSearchScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(R.string.cd_back)
                         )
                     }
                 },
@@ -111,28 +137,31 @@ fun LiteratureSearchScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = dimensionResource(R.dimen.padding_large))
         ) {
             // Search Bar & Button Row
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp),
+                    .padding(vertical = dimensionResource(R.dimen.padding_small)),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small))
             ) {
                 OutlinedTextField(
-                    value = uiState.searchQuery,
-                    onValueChange = { viewModel.onSearchQueryChanged(it) },
+                    value = state.searchQuery,
+                    onValueChange = onSearchQueryChanged,
                     modifier = Modifier.weight(1f),
-                    placeholder = { Text("Search PubMed papers...") },
+                    placeholder = { Text(stringResource(R.string.placeholder_search_pubmed)) },
                     leadingIcon = {
                         Icon(imageVector = Icons.Default.Search, contentDescription = null)
                     },
                     trailingIcon = {
-                        if (uiState.searchQuery.isNotEmpty()) {
-                            IconButton(onClick = { viewModel.onSearchQueryChanged("") }) {
-                                Icon(imageVector = Icons.Default.Clear, contentDescription = "Clear")
+                        if (state.searchQuery.isNotEmpty()) {
+                            IconButton(onClick = { onSearchQueryChanged("") }) {
+                                Icon(
+                                    imageVector = Icons.Default.Clear,
+                                    contentDescription = stringResource(R.string.cd_clear)
+                                )
                             }
                         }
                     },
@@ -141,7 +170,7 @@ fun LiteratureSearchScreen(
                     keyboardActions = KeyboardActions(
                         onSearch = {
                             keyboardController?.hide()
-                            viewModel.performSearch()
+                            onPerformSearch()
                         }
                     ),
                     shape = MaterialTheme.shapes.medium
@@ -150,34 +179,34 @@ fun LiteratureSearchScreen(
                 Button(
                     onClick = {
                         keyboardController?.hide()
-                        viewModel.performSearch()
+                        onPerformSearch()
                     },
-                    enabled = !uiState.isLoading
+                    enabled = !state.isLoading
                 ) {
-                    Text("Search")
+                    Text(stringResource(R.string.btn_search))
                 }
             }
 
             // Mock Service Notice Banner
-            androidx.compose.material3.Surface(
+            Surface(
                 color = MaterialTheme.colorScheme.secondaryContainer,
                 shape = MaterialTheme.shapes.small,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 4.dp)
+                    .padding(vertical = dimensionResource(R.dimen.padding_tiny))
             ) {
                 Row(
-                    modifier = Modifier.padding(12.dp),
+                    modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium)),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
                         imageVector = Icons.Default.Info,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                        modifier = Modifier.padding(end = 8.dp)
+                        modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_small))
                     )
                     Text(
-                        text = "Mock Literature Service: Search results simulate PubMed integration.",
+                        text = stringResource(R.string.header_mock_literature_notice),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
@@ -185,13 +214,13 @@ fun LiteratureSearchScreen(
             }
 
             Box(modifier = Modifier.fillMaxSize()) {
-                if (uiState.isLoading) {
+                if (state.isLoading) {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                } else if (uiState.publications.isEmpty()) {
+                } else if (state.publications.isEmpty()) {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(32.dp),
+                            .padding(dimensionResource(R.dimen.padding_huge)),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
@@ -199,35 +228,35 @@ fun LiteratureSearchScreen(
                             imageVector = Icons.AutoMirrored.Filled.MenuBook,
                             contentDescription = null,
                             modifier = Modifier
-                                .height(48.dp)
-                                .width(48.dp),
+                                .height(dimensionResource(R.dimen.icon_size_huge))
+                                .width(dimensionResource(R.dimen.icon_size_huge)),
                             tint = MaterialTheme.colorScheme.primary
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
                         Text(
-                            text = "No publication results found.",
+                            text = stringResource(R.string.header_no_publications_found),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_tiny)))
                         Text(
-                            text = "Try searching for terms like 'iPSC', 'HeLa', 'Vero', or 'confluency'.",
+                            text = stringResource(R.string.header_no_publications_hint),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 } else {
                     LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        items(uiState.publications, key = { it.id }) { publication ->
-                            val isAssociated = uiState.associatedPublicationIds.contains(publication.id)
+                        items(state.publications, key = { it.id }) { publication ->
+                            val isAssociated = state.associatedPublicationIds.contains(publication.id)
                             PublicationCard(
                                 publication = publication,
                                 isAssociated = isAssociated,
-                                canAssociate = !uiState.cultureId.isNullOrEmpty(),
-                                onToggleAssociation = { viewModel.toggleAssociation(publication) },
+                                canAssociate = !state.cultureId.isNullOrEmpty(),
+                                onToggleAssociation = { onToggleAssociation(publication) },
                                 onOpenUrl = {
                                     publication.externalUrl?.let { url ->
                                         try {
@@ -238,7 +267,7 @@ fun LiteratureSearchScreen(
                                 }
                             )
                         }
-                        item { Spacer(modifier = Modifier.height(24.dp)) }
+                        item { Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_extra_large))) }
                     }
                 }
             }
@@ -261,13 +290,13 @@ fun PublicationCard(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation))
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+                .padding(dimensionResource(R.dimen.padding_large)),
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small))
         ) {
             Text(
                 text = publication.title,
@@ -314,22 +343,24 @@ fun PublicationCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 4.dp),
+                    .padding(top = dimensionResource(R.dimen.padding_tiny)),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 if (!publication.externalUrl.isNullOrBlank()) {
                     OutlinedButton(
                         onClick = onOpenUrl,
-                        modifier = Modifier.height(36.dp)
+                        modifier = Modifier.height(dimensionResource(R.dimen.button_height_small))
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.OpenInNew,
                             contentDescription = null,
-                            modifier = Modifier.height(16.dp).width(16.dp)
+                            modifier = Modifier
+                                .height(dimensionResource(R.dimen.icon_size_small))
+                                .width(dimensionResource(R.dimen.icon_size_small))
                         )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text("View Paper", style = MaterialTheme.typography.labelMedium)
+                        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))
+                        Text(stringResource(R.string.btn_view_paper), style = MaterialTheme.typography.labelMedium)
                     }
                 } else {
                     Spacer(modifier = Modifier.width(1.dp))
@@ -338,21 +369,53 @@ fun PublicationCard(
                 if (canAssociate) {
                     Button(
                         onClick = onToggleAssociation,
-                        modifier = Modifier.height(36.dp)
+                        modifier = Modifier.height(dimensionResource(R.dimen.button_height_small))
                     ) {
                         Icon(
                             imageVector = if (isAssociated) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
                             contentDescription = null,
-                            modifier = Modifier.height(16.dp).width(16.dp)
+                            modifier = Modifier
+                                .height(dimensionResource(R.dimen.icon_size_small))
+                                .width(dimensionResource(R.dimen.icon_size_small))
                         )
-                        Spacer(modifier = Modifier.width(6.dp))
+                        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))
                         Text(
-                            text = if (isAssociated) "Associated" else "Associate",
+                            text = stringResource(if (isAssociated) R.string.btn_associated else R.string.btn_associate),
                             style = MaterialTheme.typography.labelMedium
                         )
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+@Preview
+private fun LiteratureSearchScreenPreview() {
+    MaterialTheme {
+        Surface {
+            LiteratureSearchScreenContent(
+                state = LiteratureSearchUiState(
+                    isLoading = false,
+                    searchQuery = "iPSC",
+                    publications = listOf(
+                        ScientificPublication(
+                            id = "pub1",
+                            title = "Stem cell differentiation protocols in 3D culture",
+                            authors = listOf("Smith J.", "Doe A."),
+                            source = "Cell Biology Journal",
+                            publicationYear = 2023,
+                            abstractText = "Abstract snippet describing the research..."
+                        )
+                    )
+                ),
+                onSearchQueryChanged = {},
+                onPerformSearch = {},
+                onToggleAssociation = {},
+                clearMessage = {},
+                onNavigateBack = {}
+            )
         }
     }
 }

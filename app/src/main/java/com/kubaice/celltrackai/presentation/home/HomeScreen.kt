@@ -23,7 +23,6 @@ import androidx.compose.material.icons.filled.Dataset
 import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.filled.Update
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -44,14 +43,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.kubaice.celltrackai.R
 import com.kubaice.celltrackai.domain.model.CellCulture
+
+private const val CARD_TITLE_MAX_LINES = 2
 
 @Composable
 fun HomeScreen(
@@ -100,10 +105,10 @@ private fun HomeScreenContent(
                             imageVector = Icons.Default.Science,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(end = 8.dp)
+                            modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_small))
                         )
                         Text(
-                            text = "CellTrack AI",
+                            text = stringResource(R.string.app_name),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
@@ -127,31 +132,23 @@ private fun HomeScreenContent(
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                        .padding(horizontal = dimensionResource(R.dimen.padding_large)),
+                    verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_large))
                 ) {
                     item {
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
                         // Summary Cards Row
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium))
                         ) {
                             SummaryCard(
                                 modifier = Modifier.weight(1f),
-                                title = "Active Cultures",
+                                title = stringResource(R.string.header_active_cultures),
                                 value = state.totalActiveCultures.toString(),
                                 icon = Icons.Default.Science,
                                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                                 contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                            )
-                            SummaryCard(
-                                modifier = Modifier.weight(1f),
-                                title = "Recent Updates (7d)",
-                                value = state.recentUpdatesCount.toString(),
-                                icon = Icons.Default.Update,
-                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                contentColor = MaterialTheme.colorScheme.onSecondaryContainer
                             )
                         }
                     }
@@ -160,11 +157,11 @@ private fun HomeScreenContent(
                         // Quick Action Buttons
                         Column(
                             modifier = Modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small))
                         ) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small))
                             ) {
                                 Button(
                                     onClick = onNavigateToCreateCulture,
@@ -175,9 +172,9 @@ private fun HomeScreenContent(
                                     Icon(
                                         imageVector = Icons.Default.Add,
                                         contentDescription = null,
-                                        modifier = Modifier.padding(end = 4.dp)
+                                        modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_tiny))
                                     )
-                                    Text("New Culture")
+                                    Text(stringResource(R.string.btn_new_culture))
                                 }
 
                                 OutlinedButton(
@@ -189,9 +186,9 @@ private fun HomeScreenContent(
                                     Icon(
                                         imageVector = Icons.AutoMirrored.Filled.List,
                                         contentDescription = null,
-                                        modifier = Modifier.padding(end = 4.dp)
+                                        modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_tiny))
                                     )
-                                    Text("All Cultures")
+                                    Text(stringResource(R.string.btn_all_cultures))
                                 }
                             }
 
@@ -207,15 +204,15 @@ private fun HomeScreenContent(
                                             .width(18.dp),
                                         strokeWidth = 2.dp
                                     )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text("Loading Demo Data...")
+                                    Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_small)))
+                                    Text(stringResource(R.string.btn_loading_demo))
                                 } else {
                                     Icon(
                                         imageVector = Icons.Default.Dataset,
                                         contentDescription = null,
-                                        modifier = Modifier.padding(end = 8.dp)
+                                        modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_small))
                                     )
-                                    Text("Populate Demo Data")
+                                    Text(stringResource(R.string.btn_populate_demo))
                                 }
                             }
                         }
@@ -223,11 +220,11 @@ private fun HomeScreenContent(
 
                     item {
                         Text(
-                            text = "Recently Updated Active Cultures",
+                            text = stringResource(R.string.header_recently_updated_active),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.padding(top = 8.dp)
+                            modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_small))
                         )
                     }
 
@@ -236,7 +233,7 @@ private fun HomeScreenContent(
                             Card(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(vertical = 12.dp),
+                                    .padding(vertical = dimensionResource(R.dimen.padding_medium)),
                                 colors = CardDefaults.cardColors(
                                     containerColor = MaterialTheme.colorScheme.surfaceVariant
                                 )
@@ -244,7 +241,7 @@ private fun HomeScreenContent(
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(24.dp),
+                                        .padding(dimensionResource(R.dimen.padding_extra_large)),
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                     verticalArrangement = Arrangement.Center
                                 ) {
@@ -252,19 +249,19 @@ private fun HomeScreenContent(
                                         imageVector = Icons.Default.Science,
                                         contentDescription = null,
                                         modifier = Modifier
-                                            .height(48.dp)
-                                            .width(48.dp),
+                                            .height(dimensionResource(R.dimen.icon_size_huge))
+                                            .width(dimensionResource(R.dimen.icon_size_huge)),
                                         tint = MaterialTheme.colorScheme.primary
                                     )
-                                    Spacer(modifier = Modifier.height(12.dp))
+                                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
                                     Text(
-                                        text = "No Active Cultures Found",
+                                        text = stringResource(R.string.header_no_active_cultures),
                                         style = MaterialTheme.typography.titleMedium,
                                         fontWeight = FontWeight.SemiBold
                                     )
-                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_tiny)))
                                     Text(
-                                        text = "Click 'Populate Demo Data' above or 'New Culture' to create your first culture tracking entry.",
+                                        text = stringResource(R.string.header_no_active_cultures_desc),
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -281,7 +278,7 @@ private fun HomeScreenContent(
                     }
 
                     item {
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_extra_large)))
                     }
                 }
             }
@@ -308,7 +305,7 @@ fun SummaryCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(dimensionResource(R.dimen.padding_large))
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -316,6 +313,8 @@ fun SummaryCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
+                    modifier = Modifier
+                        .weight(1f),
                     text = title,
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Medium
@@ -324,11 +323,11 @@ fun SummaryCard(
                     imageVector = icon,
                     contentDescription = null,
                     modifier = Modifier
-                        .height(20.dp)
-                        .width(20.dp)
+                        .height(dimensionResource(R.dimen.icon_size_medium))
+                        .width(dimensionResource(R.dimen.icon_size_medium))
                 )
             }
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
             Text(
                 text = value,
                 style = MaterialTheme.typography.headlineLarge,
@@ -354,12 +353,12 @@ fun CultureQuickCard(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation))
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(dimensionResource(R.dimen.padding_large))
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -367,9 +366,13 @@ fun CultureQuickCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
+                    modifier = Modifier
+                        .weight(1f),
                     text = culture.name,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = CARD_TITLE_MAX_LINES,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Surface(
@@ -377,17 +380,20 @@ fun CultureQuickCard(
                     shape = MaterialTheme.shapes.small
                 ) {
                     Text(
-                        text = "ACTIVE",
+                        text = stringResource(R.string.label_status_active),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        modifier = Modifier.padding(
+                            horizontal = dimensionResource(R.dimen.padding_small),
+                            vertical = dimensionResource(R.dimen.padding_tiny)
+                        ),
                         fontWeight = FontWeight.Bold
                     )
                 }
             }
 
             if (!culture.cellType.isNullOrBlank()) {
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_tiny)))
                 Text(
                     text = culture.cellType,
                     style = MaterialTheme.typography.bodyMedium,
@@ -395,9 +401,9 @@ fun CultureQuickCard(
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
             Text(
-                text = "Last updated: $formattedDate",
+                text = stringResource(R.string.label_last_updated, formattedDate),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

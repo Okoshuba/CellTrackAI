@@ -71,28 +71,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.kubaice.celltrackai.R
 import com.kubaice.celltrackai.domain.ai.StructuredObservationResult
 import com.kubaice.celltrackai.domain.model.EventType
+import com.kubaice.celltrackai.presentation.elements.CellTrackTopAppBar
+import com.kubaice.celltrackai.presentation.elements.LoadingIndicator
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateEditEventScreen(
-    viewModel: CreateEditEventViewModel,
+    viewModel: CreateEditEventViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    var showDatePicker by remember { mutableStateOf(false) }
-    var eventTypeDropdownExpanded by remember { mutableStateOf(false) }
-
-    val dateFormat = remember { SimpleDateFormat("MMMM dd, yyyy - HH:mm", Locale.getDefault()) }
-    val dateStr = remember(uiState.occurredAt) { dateFormat.format(Date(uiState.occurredAt)) }
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -106,42 +105,63 @@ fun CreateEditEventScreen(
         }
     }
 
-    LaunchedEffect(uiState.message) {
-        uiState.message?.let {
+    CreateEditEventScreenContent(
+        state = uiState,
+        onTypeSelected = viewModel::onTypeSelected,
+        onOccurredAtChanged = viewModel::onOccurredAtChanged,
+        onPassageNumberChanged = viewModel::onPassageNumberChanged,
+        onConfluencyChanged = viewModel::onConfluencyChanged,
+        onNotesChanged = viewModel::onNotesChanged,
+        triggerAiStructuringHelper = viewModel::triggerAiStructuringHelper,
+        onAddImage = { imagePickerLauncher.launch("image/*") },
+        onRemoveImageUri = viewModel::removeImageUri,
+        onSaveEvent = viewModel::saveEvent,
+        applyStructuredData = viewModel::applyStructuredData,
+        dismissStructuringDialog = viewModel::dismissStructuringDialog,
+        clearMessage = viewModel::clearMessage,
+        onNavigateBack = onNavigateBack
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CreateEditEventScreenContent(
+    state: CreateEditEventUiState,
+    onTypeSelected: (EventType) -> Unit,
+    onOccurredAtChanged: (Long) -> Unit,
+    onPassageNumberChanged: (String) -> Unit,
+    onConfluencyChanged: (Float?) -> Unit,
+    onNotesChanged: (String) -> Unit,
+    triggerAiStructuringHelper: () -> Unit,
+    onAddImage: () -> Unit,
+    onRemoveImageUri: (String) -> Unit,
+    onSaveEvent: () -> Unit,
+    applyStructuredData: (StructuredObservationResult) -> Unit,
+    dismissStructuringDialog: () -> Unit,
+    clearMessage: () -> Unit,
+    onNavigateBack: () -> Unit
+) {
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    var showDatePicker by remember { mutableStateOf(false) }
+    var eventTypeDropdownExpanded by remember { mutableStateOf(false) }
+
+    val dateFormat = remember { SimpleDateFormat("MMMM dd, yyyy - HH:mm", Locale.getDefault()) }
+    val dateStr = remember(state.occurredAt) { dateFormat.format(Date(state.occurredAt)) }
+
+    LaunchedEffect(state.message) {
+        state.message?.let {
             snackbarHostState.showSnackbar(it)
-            viewModel.clearMessage()
+            clearMessage()
         }
     }
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Column {
-                        Text(
-                            text = if (uiState.isEditMode) "Edit Event" else "Log Culture Event",
-                            fontWeight = FontWeight.Bold
-                        )
-                        uiState.culture?.let { cult ->
-                            Text(
-                                text = cult.name,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
+            CellTrackTopAppBar(
+                title = stringResource(if (state.isEditMode) R.string.title_edit_event else R.string.title_log_event),
+                subtitle = state.culture?.name,
+                onNavigateBack = onNavigateBack
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -151,15 +171,15 @@ fun CreateEditEventScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            if (uiState.isLoading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            if (state.isLoading) {
+                LoadingIndicator()
             } else {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(16.dp)
+                        .padding(dimensionResource(R.dimen.padding_large))
                         .verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_large))
                 ) {
                     // Event Type Dropdown
                     ExposedDropdownMenuBox(
@@ -168,10 +188,10 @@ fun CreateEditEventScreen(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         OutlinedTextField(
-                            value = uiState.type.name.replace("_", " "),
+                            value = state.type.name.replace("_", " "),
                             onValueChange = {},
                             readOnly = true,
-                            label = { Text("Event Type *") },
+                            label = { Text(stringResource(R.string.label_event_type)) },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = eventTypeDropdownExpanded) },
                             colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
                             modifier = Modifier
@@ -186,7 +206,7 @@ fun CreateEditEventScreen(
                                 DropdownMenuItem(
                                     text = { Text(typeOption.name.replace("_", " ")) },
                                     onClick = {
-                                        viewModel.onTypeSelected(typeOption)
+                                        onTypeSelected(typeOption)
                                         eventTypeDropdownExpanded = false
                                     }
                                 )
@@ -199,12 +219,12 @@ fun CreateEditEventScreen(
                         value = dateStr,
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Date & Time") },
+                        label = { Text(stringResource(R.string.label_date_time)) },
                         trailingIcon = {
                             IconButton(onClick = { showDatePicker = true }) {
                                 Icon(
                                     imageVector = Icons.Default.CalendarToday,
-                                    contentDescription = "Select Date"
+                                    contentDescription = stringResource(R.string.cd_select_date)
                                 )
                             }
                         },
@@ -213,10 +233,10 @@ fun CreateEditEventScreen(
 
                     // Passage Number
                     OutlinedTextField(
-                        value = uiState.passageNumberText,
-                        onValueChange = { viewModel.onPassageNumberChanged(it) },
-                        label = { Text("Passage Number (Optional)") },
-                        placeholder = { Text("e.g. 14") },
+                        value = state.passageNumberText,
+                        onValueChange = onPassageNumberChanged,
+                        label = { Text(stringResource(R.string.label_passage_number_optional)) },
+                        placeholder = { Text(stringResource(R.string.placeholder_passage_number)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
@@ -232,7 +252,7 @@ fun CreateEditEventScreen(
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp)
+                                .padding(dimensionResource(R.dimen.padding_large))
                         ) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -240,21 +260,21 @@ fun CreateEditEventScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = "Confluency Percentage",
+                                    text = stringResource(R.string.header_confluency_percentage),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.SemiBold
                                 )
                                 Text(
-                                    text = uiState.confluencyPercentage?.let { "%.0f%%".format(it) } ?: "Not Set",
+                                    text = state.confluencyPercentage?.let { "%.0f%%".format(it) } ?: stringResource(R.string.label_not_set),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.primary
                                 )
                             }
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
                             Slider(
-                                value = uiState.confluencyPercentage ?: 0f,
-                                onValueChange = { viewModel.onConfluencyChanged(it) },
+                                value = state.confluencyPercentage ?: 0f,
+                                onValueChange = { onConfluencyChanged(it) },
                                 valueRange = 0f..100f,
                                 steps = 99
                             )
@@ -263,10 +283,10 @@ fun CreateEditEventScreen(
                                 horizontalArrangement = Arrangement.End
                             ) {
                                 TextButton(
-                                    onClick = { viewModel.onConfluencyChanged(null) },
-                                    enabled = uiState.confluencyPercentage != null
+                                    onClick = { onConfluencyChanged(null) },
+                                    enabled = state.confluencyPercentage != null
                                 ) {
-                                    Text("Clear Confluency")
+                                    Text(stringResource(R.string.btn_clear_confluency))
                                 }
                             }
                         }
@@ -274,10 +294,10 @@ fun CreateEditEventScreen(
 
                     // Notes & Observations
                     OutlinedTextField(
-                        value = uiState.notes,
-                        onValueChange = { viewModel.onNotesChanged(it) },
-                        label = { Text("Observation Notes & Technical Details") },
-                        placeholder = { Text("Describe cell morphology, media color, growth status, or passaging ratio...") },
+                        value = state.notes,
+                        onValueChange = onNotesChanged,
+                        label = { Text(stringResource(R.string.header_observation_notes)) },
+                        placeholder = { Text(stringResource(R.string.placeholder_event_notes)) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(130.dp),
@@ -286,28 +306,28 @@ fun CreateEditEventScreen(
 
                     // AI Structuring Helper Button
                     OutlinedButton(
-                        onClick = { viewModel.triggerAiStructuringHelper() },
+                        onClick = triggerAiStructuringHelper,
                         modifier = Modifier.fillMaxWidth(),
-                        enabled = !uiState.isStructuringLoading && uiState.notes.isNotBlank(),
+                        enabled = !state.isStructuringLoading && state.notes.isNotBlank(),
                         colors = ButtonDefaults.outlinedButtonColors(
                             contentColor = MaterialTheme.colorScheme.tertiary
                         )
                     ) {
-                        if (uiState.isStructuringLoading) {
+                        if (state.isStructuringLoading) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(18.dp),
                                 strokeWidth = 2.dp,
                                 color = MaterialTheme.colorScheme.tertiary
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("Structuring with AI...")
+                            Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_small)))
+                            Text(stringResource(R.string.btn_structuring_ai))
                         } else {
                             Icon(
                                 imageVector = Icons.Default.AutoAwesome,
                                 contentDescription = null,
-                                modifier = Modifier.padding(end = 8.dp)
+                                modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_small))
                             )
-                            Text("AI Structuring Helper", fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.btn_ai_structuring_helper), fontWeight = FontWeight.Bold)
                         }
                     }
 
@@ -319,27 +339,27 @@ fun CreateEditEventScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "Attached Microscopy Images (${uiState.attachedImageUris.size})",
+                                text = stringResource(R.string.header_attached_images, state.attachedImageUris.size),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.SemiBold
                             )
-                            TextButton(onClick = { imagePickerLauncher.launch("image/*") }) {
+                            TextButton(onClick = onAddImage) {
                                 Icon(
                                     imageVector = Icons.Default.AddPhotoAlternate,
                                     contentDescription = null,
-                                    modifier = Modifier.padding(end = 4.dp)
+                                    modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_tiny))
                                 )
-                                Text("Add Image")
+                                Text(stringResource(R.string.btn_add_image))
                             }
                         }
 
-                        if (uiState.attachedImageUris.isNotEmpty()) {
-                            Spacer(modifier = Modifier.height(8.dp))
-                            LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                                items(uiState.attachedImageUris) { uri ->
+                        if (state.attachedImageUris.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
+                            LazyRow(horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium))) {
+                                items(state.attachedImageUris) { uri ->
                                     Box(
                                         modifier = Modifier
-                                            .size(100.dp)
+                                            .size(dimensionResource(R.dimen.image_box_size))
                                             .clip(RoundedCornerShape(8.dp))
                                             .border(
                                                 1.dp,
@@ -349,16 +369,16 @@ fun CreateEditEventScreen(
                                     ) {
                                         AsyncImage(
                                             model = uri,
-                                            contentDescription = "Attached Image",
+                                            contentDescription = stringResource(R.string.cd_attached_image),
                                             contentScale = ContentScale.Crop,
                                             modifier = Modifier.fillMaxSize()
                                         )
                                         IconButton(
-                                            onClick = { viewModel.removeImageUri(uri) },
+                                            onClick = { onRemoveImageUri(uri) },
                                             modifier = Modifier
                                                 .align(Alignment.TopEnd)
-                                                .padding(2.dp)
-                                                .size(24.dp)
+                                                .padding(dimensionResource(R.dimen.padding_extra_small))
+                                                .size(dimensionResource(R.dimen.icon_size_large))
                                                 .background(
                                                     MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
                                                     CircleShape
@@ -366,9 +386,9 @@ fun CreateEditEventScreen(
                                         ) {
                                             Icon(
                                                 imageVector = Icons.Default.Close,
-                                                contentDescription = "Remove Image",
+                                                contentDescription = stringResource(R.string.cd_remove_image),
                                                 tint = MaterialTheme.colorScheme.error,
-                                                modifier = Modifier.size(16.dp)
+                                                modifier = Modifier.size(dimensionResource(R.dimen.icon_size_small))
                                             )
                                         }
                                     }
@@ -377,27 +397,27 @@ fun CreateEditEventScreen(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
 
                     // Save Button
                     Button(
-                        onClick = { viewModel.saveEvent() },
+                        onClick = onSaveEvent,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(50.dp)
+                            .height(dimensionResource(R.dimen.button_height))
                     ) {
                         Icon(
                             imageVector = Icons.Default.Save,
                             contentDescription = null,
-                            modifier = Modifier.padding(end = 8.dp)
+                            modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_small))
                         )
                         Text(
-                            text = if (uiState.isEditMode) "Update Event" else "Save Event",
+                            text = stringResource(if (state.isEditMode) R.string.btn_update_event else R.string.btn_save_event),
                             style = MaterialTheme.typography.titleMedium
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_extra_large)))
                 }
             }
         }
@@ -405,23 +425,23 @@ fun CreateEditEventScreen(
         // Date Picker Dialog
         if (showDatePicker) {
             val datePickerState = rememberDatePickerState(
-                initialSelectedDateMillis = uiState.occurredAt
+                initialSelectedDateMillis = state.occurredAt
             )
             DatePickerDialog(
                 onDismissRequest = { showDatePicker = false },
                 confirmButton = {
                     TextButton(onClick = {
                         datePickerState.selectedDateMillis?.let {
-                            viewModel.onOccurredAtChanged(it)
+                            onOccurredAtChanged(it)
                         }
                         showDatePicker = false
                     }) {
-                        Text("OK")
+                        Text(stringResource(R.string.btn_ok))
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { showDatePicker = false }) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.btn_cancel))
                     }
                 }
             ) {
@@ -430,11 +450,11 @@ fun CreateEditEventScreen(
         }
 
         // AI Structuring Review Dialog
-        if (uiState.showStructuringDialog && uiState.structuringResult != null) {
+        if (state.showStructuringDialog && state.structuringResult != null) {
             StructuringResultDialog(
-                result = uiState.structuringResult!!,
-                onConfirm = { viewModel.applyStructuredData(uiState.structuringResult!!) },
-                onDismiss = { viewModel.dismissStructuringDialog() }
+                result = state.structuringResult,
+                onConfirm = { applyStructuredData(state.structuringResult) },
+                onDismiss = dismissStructuringDialog
             )
         }
     }
@@ -456,14 +476,14 @@ fun StructuringResultDialog(
             )
         },
         title = {
-            Text("AI Structured Observation Review", fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.header_ai_review_title), fontWeight = FontWeight.Bold)
         },
         text = {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium))
             ) {
                 Text(
                     text = result.explanation,
@@ -479,34 +499,34 @@ fun StructuringResultDialog(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(12.dp),
+                            .padding(dimensionResource(R.dimen.padding_medium)),
                         verticalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         result.parsedCellType?.let {
-                            Text("Cell Type: $it", fontWeight = FontWeight.Medium)
+                            Text(stringResource(R.string.ai_label_cell_type, it), fontWeight = FontWeight.Medium)
                         }
                         result.parsedPassageNumber?.let {
-                            Text("Passage Number: $it", fontWeight = FontWeight.Medium)
+                            Text(stringResource(R.string.ai_label_passage_number, it), fontWeight = FontWeight.Medium)
                         }
                         result.parsedConfluencyPct?.let {
-                            Text("Confluency: ${"%.0f%%".format(it)}", fontWeight = FontWeight.Medium)
+                            Text(stringResource(R.string.ai_label_confluency, it), fontWeight = FontWeight.Medium)
                         }
                         if (result.observedPhenotypes.isNotEmpty()) {
                             Text(
-                                "Phenotypes: ${result.observedPhenotypes.joinToString(", ")}",
+                                stringResource(R.string.ai_label_phenotypes, result.observedPhenotypes.joinToString(", ")),
                                 fontWeight = FontWeight.Medium
                             )
                         }
                         if (!result.contaminationRisk.isNullOrBlank()) {
                             Text(
-                                "Contamination Risk: ${result.contaminationRisk}",
+                                stringResource(R.string.ai_label_contamination_risk, result.contaminationRisk),
                                 color = MaterialTheme.colorScheme.error,
                                 fontWeight = FontWeight.Bold
                             )
                         }
                         if (result.recommendedActions.isNotEmpty()) {
                             Text(
-                                "Recommendations: ${result.recommendedActions.joinToString("; ")}",
+                                stringResource(R.string.ai_label_recommendations, result.recommendedActions.joinToString("; ")),
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }
@@ -516,13 +536,40 @@ fun StructuringResultDialog(
         },
         confirmButton = {
             Button(onClick = onConfirm) {
-                Text("Apply to Form")
+                Text(stringResource(R.string.btn_apply_to_form))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Discard")
+                Text(stringResource(R.string.btn_discard))
             }
         }
     )
+}
+
+@Composable
+@Preview
+private fun CreateEditEventScreenPreview() {
+    MaterialTheme {
+        Surface {
+            CreateEditEventScreenContent(
+                state = CreateEditEventUiState(
+                    isLoading = false
+                ),
+                onTypeSelected = {},
+                onOccurredAtChanged = {},
+                onPassageNumberChanged = {},
+                onConfluencyChanged = {},
+                onNotesChanged = {},
+                triggerAiStructuringHelper = {},
+                onAddImage = {},
+                onRemoveImageUri = {},
+                onSaveEvent = {},
+                applyStructuredData = {},
+                dismissStructuringDialog = {},
+                clearMessage = {},
+                onNavigateBack = {}
+            )
+        }
+    }
 }

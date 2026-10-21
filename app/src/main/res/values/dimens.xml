@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Padding & Margins -->
+    <dimen name="padding_extra_small">2dp</dimen>
+    <dimen name="padding_tiny">4dp</dimen>
+    <dimen name="padding_6">6dp</dimen>
+    <dimen name="padding_small">8dp</dimen>
+    <dimen name="padding_medium">12dp</dimen>
+    <dimen name="padding_large">16dp</dimen>
+    <dimen name="padding_extra_large">24dp</dimen>
+    <dimen name="padding_huge">32dp</dimen>
+
+    <!-- Spacing -->
+    <dimen name="spacing_tiny">4dp</dimen>
+    <dimen name="spacing_small">8dp</dimen>
+    <dimen name="spacing_medium">12dp</dimen>
+    <dimen name="spacing_large">16dp</dimen>
+    <dimen name="spacing_extra_large">24dp</dimen>
+    <dimen name="spacing_huge">32dp</dimen>
+
+    <!-- Component Sizes -->
+    <dimen name="card_elevation">2dp</dimen>
+    <dimen name="card_elevation_small">1dp</dimen>
+    <dimen name="button_height">50dp</dimen>
+    <dimen name="button_height_small">36dp</dimen>
+    <dimen name="button_height_tiny">32dp</dimen>
+    <dimen name="icon_size_tiny">14dp</dimen>
+    <dimen name="icon_size_small">16dp</dimen>
+    <dimen name="icon_size_18">18dp</dimen>
+    <dimen name="icon_size_medium">20dp</dimen>
+    <dimen name="icon_size_large">24dp</dimen>
+    <dimen name="icon_size_huge">48dp</dimen>
+    <dimen name="avatar_size">40dp</dimen>
+    <dimen name="thumbnail_size">72dp</dimen>
+    <dimen name="image_box_size">100dp</dimen>
+</resources>

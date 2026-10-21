@@ -68,24 +68,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.kubaice.celltrackai.R
 import com.kubaice.celltrackai.domain.model.CellCulture
 import com.kubaice.celltrackai.domain.model.CultureEvent
 import com.kubaice.celltrackai.domain.model.CultureStatus
 import com.kubaice.celltrackai.domain.model.EventType
 import com.kubaice.celltrackai.domain.model.ScientificPublication
-import com.kubaice.celltrackai.presentation.theme.StatusActiveContainerDark
-import com.kubaice.celltrackai.presentation.theme.StatusActiveContainerLight
-import com.kubaice.celltrackai.presentation.theme.StatusActiveDark
-import com.kubaice.celltrackai.presentation.theme.StatusActiveLight
+import com.kubaice.celltrackai.presentation.elements.CellTrackTopAppBar
+import com.kubaice.celltrackai.presentation.elements.CultureStatusBadge
+import com.kubaice.celltrackai.presentation.elements.EventTypeIcon
+import com.kubaice.celltrackai.presentation.elements.LoadingIndicator
+import com.kubaice.celltrackai.presentation.elements.PublicationItemCard
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CultureDetailScreen(
-    viewModel: CultureDetailViewModel,
+    viewModel: CultureDetailViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit,
     onNavigateToEditCulture: (String) -> Unit,
     onNavigateToAddEvent: (String) -> Unit,
@@ -93,9 +99,12 @@ fun CultureDetailScreen(
     onNavigateToImagePreview: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    val csvSuccessMsg = stringResource(R.string.msg_csv_exported)
+    val csvFailedMsg = stringResource(R.string.msg_csv_export_failed)
 
     val exportCsvLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("text/csv")
@@ -106,42 +115,73 @@ fun CultureDetailScreen(
                     val csvText = viewModel.generateCsvContent()
                     outputStream.write(csvText.toByteArray())
                 }
-                scope.launch { snackbarHostState.showSnackbar("CSV exported successfully") }
+                scope.launch { snackbarHostState.showSnackbar(csvSuccessMsg) }
             } catch (e: Exception) {
-                scope.launch { snackbarHostState.showSnackbar("Failed to export CSV: ${e.message}") }
+                scope.launch { snackbarHostState.showSnackbar(String.format(csvFailedMsg, e.message ?: "")) }
             }
         }
     }
 
-    LaunchedEffect(uiState.message) {
-        uiState.message?.let {
+    CultureDetailScreenContent(
+        state = uiState,
+        snackbarHostState = snackbarHostState,
+        onToggleArchiveStatus = viewModel::toggleArchiveStatus,
+        onExportCsv = {
+            val cultureName = uiState.culture?.name?.lowercase()?.replace(" ", "_") ?: "culture"
+            val fileName = "culture_${cultureName}_export.csv"
+            exportCsvLauncher.launch(fileName)
+        },
+        onRemovePublicationAssociation = viewModel::removePublicationAssociation,
+        onDeleteEvent = viewModel::deleteEvent,
+        clearMessage = viewModel::clearMessage,
+        onNavigateBack = onNavigateBack,
+        onNavigateToEditCulture = onNavigateToEditCulture,
+        onNavigateToAddEvent = onNavigateToAddEvent,
+        onNavigateToLiteratureSearch = onNavigateToLiteratureSearch,
+        onNavigateToImagePreview = onNavigateToImagePreview
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CultureDetailScreenContent(
+    state: CultureDetailUiState,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    onToggleArchiveStatus: () -> Unit,
+    onExportCsv: () -> Unit,
+    onRemovePublicationAssociation: (String) -> Unit,
+    onDeleteEvent: (String) -> Unit,
+    clearMessage: () -> Unit,
+    onNavigateBack: () -> Unit,
+    onNavigateToEditCulture: (String) -> Unit,
+    onNavigateToAddEvent: (String) -> Unit,
+    onNavigateToLiteratureSearch: (String) -> Unit,
+    onNavigateToImagePreview: (String) -> Unit
+) {
+    val context = LocalContext.current
+
+    LaunchedEffect(state.message) {
+        state.message?.let {
             snackbarHostState.showSnackbar(it)
-            viewModel.clearMessage()
+            clearMessage()
         }
     }
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(uiState.culture?.name ?: "Culture Details", fontWeight = FontWeight.Bold) },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                },
+            CellTrackTopAppBar(
+                title = state.culture?.name ?: stringResource(R.string.title_culture_details),
+                onNavigateBack = onNavigateBack,
                 actions = {
-                    uiState.culture?.let { culture ->
+                    state.culture?.let { culture ->
                         IconButton(onClick = { onNavigateToEditCulture(culture.id) }) {
-                            Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit Culture")
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = stringResource(R.string.cd_edit_culture)
+                            )
                         }
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
+                }
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -151,56 +191,56 @@ fun CultureDetailScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            if (uiState.isLoading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            } else if (uiState.culture == null) {
+            if (state.isLoading) {
+                LoadingIndicator()
+            } else if (state.culture == null) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(24.dp),
+                        .padding(dimensionResource(R.dimen.padding_extra_large)),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Culture not found.",
+                        text = stringResource(R.string.msg_culture_not_found),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.error
                     )
                 }
             } else {
-                val culture = uiState.culture!!
+                val culture = state.culture
 
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                        .padding(horizontal = dimensionResource(R.dimen.padding_large)),
+                    verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_large))
                 ) {
                     item {
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_tiny)))
                         // Top Section: Metadata Card
                         CultureMetadataSection(
                             culture = culture,
-                            onToggleArchive = { viewModel.toggleArchiveStatus() }
+                            onToggleArchive = onToggleArchiveStatus
                         )
                     }
 
                     item {
                         // Action Buttons Row
                         Column(
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small))
                         ) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small))
                             ) {
                                 Button(
                                     onClick = { onNavigateToAddEvent(culture.id) },
                                     modifier = Modifier.weight(1f)
                                 ) {
                                     Icon(imageVector = Icons.Default.Add, contentDescription = null)
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text("Add Event")
+                                    Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))
+                                    Text(stringResource(R.string.btn_add_event))
                                 }
 
                                 OutlinedButton(
@@ -208,29 +248,26 @@ fun CultureDetailScreen(
                                     modifier = Modifier.weight(1f)
                                 ) {
                                     Icon(imageVector = Icons.AutoMirrored.Filled.MenuBook, contentDescription = null)
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text("Literature")
+                                    Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))
+                                    Text(stringResource(R.string.btn_literature))
                                 }
                             }
 
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small))
                             ) {
                                 OutlinedButton(
-                                    onClick = {
-                                        val fileName = "culture_${culture.name.lowercase().replace(" ", "_")}_export.csv"
-                                        exportCsvLauncher.launch(fileName)
-                                    },
+                                    onClick = onExportCsv,
                                     modifier = Modifier.weight(1f)
                                 ) {
                                     Icon(imageVector = Icons.Default.Download, contentDescription = null)
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text("Export CSV")
+                                    Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))
+                                    Text(stringResource(R.string.btn_export_csv))
                                 }
 
                                 OutlinedButton(
-                                    onClick = { viewModel.toggleArchiveStatus() },
+                                    onClick = onToggleArchiveStatus,
                                     modifier = Modifier.weight(1f)
                                 ) {
                                     val isActive = culture.status == CultureStatus.ACTIVE
@@ -238,25 +275,25 @@ fun CultureDetailScreen(
                                         imageVector = if (isActive) Icons.Default.Archive else Icons.Default.Unarchive,
                                         contentDescription = null
                                     )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(if (isActive) "Archive" else "Unarchive")
+                                    Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))
+                                    Text(stringResource(if (isActive) R.string.btn_archive else R.string.btn_unarchive))
                                 }
                             }
                         }
                     }
 
                     // Associated Publications Section
-                    if (uiState.publications.isNotEmpty()) {
+                    if (state.publications.isNotEmpty()) {
                         item {
                             Text(
-                                text = "Associated Publications (${uiState.publications.size})",
+                                text = stringResource(R.string.header_associated_publications, state.publications.size),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(top = 8.dp)
+                                modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_small))
                             )
                         }
 
-                        items(uiState.publications, key = { it.id }) { pub ->
+                        items(state.publications, key = { it.id }) { pub ->
                             PublicationItemCard(
                                 publication = pub,
                                 onOpenLink = { url ->
@@ -264,7 +301,7 @@ fun CultureDetailScreen(
                                     context.startActivity(intent)
                                 },
                                 onRemoveAssociation = {
-                                    viewModel.removePublicationAssociation(pub.id)
+                                    onRemovePublicationAssociation(pub.id)
                                 }
                             )
                         }
@@ -275,19 +312,19 @@ fun CultureDetailScreen(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = 8.dp),
+                                .padding(top = dimensionResource(R.dimen.padding_small)),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "Event Timeline (${uiState.events.size})",
+                                text = stringResource(R.string.header_event_timeline, state.events.size),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
                         }
                     }
 
-                    if (uiState.events.isEmpty()) {
+                    if (state.events.isEmpty()) {
                         item {
                             Card(
                                 modifier = Modifier.fillMaxWidth(),
@@ -298,33 +335,33 @@ fun CultureDetailScreen(
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(24.dp),
+                                        .padding(dimensionResource(R.dimen.padding_extra_large)),
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     Text(
-                                        text = "No events logged yet.",
+                                        text = stringResource(R.string.header_no_events_logged),
                                         style = MaterialTheme.typography.bodyLarge,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
-                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
                                     Button(onClick = { onNavigateToAddEvent(culture.id) }) {
-                                        Text("Log First Observation / Event")
+                                        Text(stringResource(R.string.btn_log_first_event))
                                     }
                                 }
                             }
                         }
                     } else {
-                        items(uiState.events, key = { it.id }) { event ->
+                        items(state.events, key = { it.id }) { event ->
                             TimelineEventCard(
                                 event = event,
                                 onImageClick = { imageUri -> onNavigateToImagePreview(imageUri) },
-                                onDeleteEvent = { viewModel.deleteEvent(event.id) }
+                                onDeleteEvent = { onDeleteEvent(event.id) }
                             )
                         }
                     }
 
                     item {
-                        Spacer(modifier = Modifier.height(32.dp))
+                        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_huge)))
                     }
                 }
             }
@@ -337,33 +374,20 @@ fun CultureMetadataSection(
     culture: CellCulture,
     onToggleArchive: () -> Unit
 ) {
-    val isDark = isSystemInDarkTheme()
     val dateFormat = remember { SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault()) }
     val startDateStr = remember(culture.startedAt) { dateFormat.format(Date(culture.startedAt)) }
-
-    val isActive = culture.status == CultureStatus.ACTIVE
-    val badgeBg = if (isActive) {
-        if (isDark) StatusActiveContainerDark else StatusActiveContainerLight
-    } else {
-        MaterialTheme.colorScheme.surfaceVariant
-    }
-    val badgeFg = if (isActive) {
-        if (isDark) StatusActiveDark else StatusActiveLight
-    } else {
-        MaterialTheme.colorScheme.onSurfaceVariant
-    }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation))
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(dimensionResource(R.dimen.padding_large))
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -377,19 +401,13 @@ fun CultureMetadataSection(
                     color = MaterialTheme.colorScheme.onSurface
                 )
 
-                Surface(
-                    color = badgeBg,
+                CultureStatusBadge(
+                    status = culture.status,
                     shape = MaterialTheme.shapes.small,
+                    horizontalPadding = dimensionResource(R.dimen.padding_small),
+                    verticalPadding = dimensionResource(R.dimen.padding_tiny),
                     modifier = Modifier.clickable(onClick = onToggleArchive)
-                ) {
-                    Text(
-                        text = culture.status.name,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = badgeFg,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+                )
             }
 
             if (!culture.cellType.isNullOrBlank()) {
@@ -399,7 +417,7 @@ fun CultureMetadataSection(
                         imageVector = Icons.Default.Science,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(dimensionResource(R.dimen.icon_size_18))
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
@@ -411,17 +429,17 @@ fun CultureMetadataSection(
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
             Text(
-                text = "Started: $startDateStr",
+                text = stringResource(R.string.label_started, startDateStr),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             if (!culture.notes.isNullOrBlank()) {
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
                 HorizontalDivider(color = DividerDefaults.color.copy(alpha = 0.5f))
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
                 Text(
                     text = culture.notes,
                     style = MaterialTheme.typography.bodyMedium,
@@ -447,7 +465,7 @@ fun PublicationItemCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp)
+                .padding(dimensionResource(R.dimen.padding_medium))
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -463,18 +481,18 @@ fun PublicationItemCard(
 
                 IconButton(
                     onClick = onRemoveAssociation,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(dimensionResource(R.dimen.icon_size_large))
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
-                        contentDescription = "Remove Association",
+                        contentDescription = stringResource(R.string.cd_remove_association),
                         tint = MaterialTheme.colorScheme.error
                     )
                 }
             }
 
             if (publication.authors.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(2.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_tiny)))
                 Text(
                     text = publication.authors.joinToString(", "),
                     style = MaterialTheme.typography.bodySmall,
@@ -500,14 +518,14 @@ fun PublicationItemCard(
                     OutlinedButton(
                         onClick = { onOpenLink(publication.externalUrl) },
                         shape = RoundedCornerShape(8.dp),
-                        modifier = Modifier.height(32.dp)
+                        modifier = Modifier.height(dimensionResource(R.dimen.button_height_tiny))
                     ) {
-                        Text("View Paper", style = MaterialTheme.typography.labelSmall)
-                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(stringResource(R.string.btn_view_paper), style = MaterialTheme.typography.labelSmall)
+                        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.OpenInNew,
                             contentDescription = null,
-                            modifier = Modifier.size(14.dp)
+                            modifier = Modifier.size(dimensionResource(R.dimen.icon_size_tiny))
                         )
                     }
                 }
@@ -530,38 +548,18 @@ fun TimelineEventCard(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation_small))
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(dimensionResource(R.dimen.padding_large)),
             verticalAlignment = Alignment.Top
         ) {
             // Event Type Icon Container
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primaryContainer),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = when (event.type) {
-                        EventType.OBSERVATION -> Icons.Default.Science
-                        EventType.MEDIA_CHANGE -> Icons.Default.Science
-                        EventType.PASSAGE -> Icons.Default.Add
-                        EventType.FREEZING -> Icons.Default.Archive
-                        EventType.THAWING -> Icons.Default.Unarchive
-                        EventType.OTHER -> Icons.Default.Science
-                    },
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
+            EventTypeIcon(type = event.type)
 
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
 
             Column(modifier = Modifier.weight(1f)) {
                 Row(
@@ -581,7 +579,7 @@ fun TimelineEventCard(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete event",
+                            contentDescription = stringResource(R.string.cd_delete_event),
                             tint = MaterialTheme.colorScheme.outline,
                             modifier = Modifier.size(18.dp)
                         )
@@ -594,11 +592,11 @@ fun TimelineEventCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
 
                 // Stats Row: Passage / Confluency
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     event.passageNumber?.let { passage ->
@@ -607,7 +605,7 @@ fun TimelineEventCard(
                             shape = MaterialTheme.shapes.extraSmall
                         ) {
                             Text(
-                                text = "Passage #$passage",
+                                text = stringResource(R.string.label_passage_badge, passage),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSecondaryContainer,
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
@@ -622,7 +620,7 @@ fun TimelineEventCard(
                             shape = MaterialTheme.shapes.extraSmall
                         ) {
                             Text(
-                                text = "Confluency: ${confluency.toInt()}%",
+                                text = stringResource(R.string.label_confluency_badge, confluency.toInt()),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onTertiaryContainer,
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
@@ -633,7 +631,7 @@ fun TimelineEventCard(
                 }
 
                 if (!event.notes.isNullOrBlank()) {
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
                     Text(
                         text = event.notes,
                         style = MaterialTheme.typography.bodyMedium,
@@ -648,12 +646,12 @@ fun TimelineEventCard(
                         modifier = Modifier
                             .fillMaxWidth()
                             .horizontalScroll(rememberScrollState()),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small))
                     ) {
                         event.imageUris.forEach { uriString ->
                             Box(
                                 modifier = Modifier
-                                    .size(72.dp)
+                                    .size(dimensionResource(R.dimen.thumbnail_size))
                                     .clip(RoundedCornerShape(8.dp))
                                     .border(
                                         width = 1.dp,
@@ -664,7 +662,7 @@ fun TimelineEventCard(
                             ) {
                                 AsyncImage(
                                     model = uriString,
-                                    contentDescription = "Event attachment",
+                                    contentDescription = stringResource(R.string.cd_event_attachment),
                                     contentScale = ContentScale.Crop,
                                     modifier = Modifier.fillMaxSize()
                                 )
@@ -673,6 +671,38 @@ fun TimelineEventCard(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+@Preview
+private fun CultureDetailScreenPreview() {
+    MaterialTheme {
+        Surface {
+            CultureDetailScreenContent(
+                state = CultureDetailUiState(
+                    isLoading = false,
+                    culture = CellCulture(
+                        id = "1",
+                        name = "iPSC Line #4",
+                        cellType = "Human iPSC",
+                        startedAt = System.currentTimeMillis(),
+                        updatedAt = System.currentTimeMillis(),
+                        notes = "Notes sample..."
+                    )
+                ),
+                onToggleArchiveStatus = {},
+                onExportCsv = {},
+                onRemovePublicationAssociation = {},
+                onDeleteEvent = {},
+                clearMessage = {},
+                onNavigateBack = {},
+                onNavigateToEditCulture = {},
+                onNavigateToAddEvent = {},
+                onNavigateToLiteratureSearch = {},
+                onNavigateToImagePreview = {}
+            )
         }
     }
 }
